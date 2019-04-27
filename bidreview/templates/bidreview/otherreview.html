@@ -1,0 +1,57 @@
+{% extends  'confsite/base.html' %}
+{% block content %}
+
+        <style>
+        .active {
+    color: white;
+    background: lightsteelblue;
+    }
+    </style>
+
+<div class="container" style = "left: 0;font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,
+    Helvetica Neue,Arial,Noto Sans,
+        sans-serif,Apple Color Emoji,Segoe UI Emoji,
+        Segoe UI Symbol,Noto Color Emoji;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;">
+<h1>Other reviews of the paper {{ a_id }}</h1>
+<table class="table">
+<thead class="thead-light">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Author</th>
+        <th scope="col">Title</th>
+        <th scope="col">Reviewer</th>
+        <th  scope="col">Status</th>
+
+    </tr>
+    {% for review in reviews %}
+        <tr id= {{ review.id}}>
+            <th scope="row" rowspan="2" class="selector">{{ review.review_id }}</th>
+            <td>{{ review.author }}</td>
+            <td>{{ review.title}}</td>
+            <td>{{ review.reviewer }}</td>
+            <td>{{ review.status }}</td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <label for="comment">
+                 <textarea class="form-control commentText" readonly rows="5" cols="100">{{ review.comment }}</textarea>
+                </label>
+            </td>
+        </tr>
+    {% endfor %}
+
+</table>
+
+
+
+</div>
+<script>
+
+</script>
+
+{% endblock %}

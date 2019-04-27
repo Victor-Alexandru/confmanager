@@ -1,0 +1,154 @@
+{% extends "confsite/base.html" %}
+{% block content %}
+    <style>
+        .active {
+    color: white;
+    background: lightsteelblue;
+    }
+    </style>
+
+<div class="container" style = "left: 0;font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,
+    Helvetica Neue,Arial,Noto Sans,
+        sans-serif,Apple Color Emoji,Segoe UI Emoji,
+        Segoe UI Symbol,Noto Color Emoji;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;">
+
+
+<h1>Assigned papers</h1>
+<table class="table">
+<thead class="thead-light">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Author</th>
+        <th scope="col">Title</th>
+        <th scope="col">Abstract </th>
+        <th  scope="col">Status</th>
+
+    </tr>
+{#  </thead>#}
+{#  <tbody>#}
+{#    <tr id=1 onclick="clickTr(this.id)">#}
+{#      <th scope="row">1</th>#}
+{#      <td>Mark Spencer</td>#}
+{#      <td>Reptiles</td>#}
+{#    </tr>#}
+{#    <tr id=2 onclick="clickTr(id)">#}
+{#      <th scope="row">2</th>#}
+{#      <td>Jacob Thornton</td>#}
+{#      <td>Lizards</td>#}
+{#    </tr>#}
+{#    <tr id=3 onclick="clickTr(id)">#}
+{#      <th scope="row">3</th>#}
+{#      <td>Larry Shumm</td>#}
+{#      <td>Birds</td>#}
+{#    </tr>#}
+{#  </tbody>#}
+    {% for paper in papers %}
+        <tr id= {{ paper.id}}>
+            <th scope="row" rowspan="2" class="selector">{{ paper.id }}</th>
+            <td>{{ paper.author }}</td>
+            <td>{{ paper.title}}</td>
+            <td>{{ paper.text }}</td>
+            <td>
+                <label for="status">
+                <select class="form-control form-control-sm">
+                <option id="selected">{{ paper.status }}</option>
+                <option>Strong Accept</option>
+                    <option>Accept</option>
+                    <option>Weak Accept</option>
+                    <option>Borderline</option>
+                    <option>Weak Reject</option>
+                    <option>Reject</option>
+                    <option>Strong Reject</option>
+                </select>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <label for="comment">
+                 <textarea class="form-control commentText" id={{ paper.id }} rows="5" cols="100">{{ paper.comment }}</textarea>
+                </label>
+            </td>
+        </tr>
+
+    {% endfor %}
+
+</table>
+
+<button type="button" class="btn btn-outline-secondary" >See details</button>
+
+</div>
+
+<script>
+
+function getAbstractId(){
+    return document.getElementsByClassName("active")[0].id;
+}
+
+window.onload = function() {
+    $("th.selector").click(function () {
+        let sel = $("#" + this.parentElement.id);
+        $('tr').removeClass('active');
+        sel.addClass("active");
+        sel.next().addClass("active");
+    });
+
+    $("select").change(function () {
+        let a_id = getAbstractId();
+        jQuery.ajax({
+                type: "POST",
+                url: '/bid/change_status/' + {{ id }} +'/' + a_id + '/',
+                dataType: 'html',
+                async: true,
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    new_status: this.value,
+                    update_type: 'status'
+
+                },
+                success: function (html) {
+                    console.log("Chilll");
+                }
+            },
+        );
+    });
+
+
+    $("textarea").change(function () {
+
+        let a_id = getAbstractId();
+        console.log(this.value);
+        jQuery.ajax({
+           type: "POST",
+                url: '/bid/change_status/' + {{ id }} +'/' + a_id + '/',
+                dataType: 'html',
+                async: true,
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    new_comment: this.value,
+                    update_type: 'comment'
+
+                },
+
+
+
+        });
+    });
+    $("button").click(function(){
+
+       window.location = '/bid/paper/' + getAbstractId() +'/';
+
+    });
+};
+
+
+
+</script>
+
+{% endblock %}
+

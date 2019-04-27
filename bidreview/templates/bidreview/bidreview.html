@@ -1,0 +1,158 @@
+{% extends "confsite/base.html" %}
+{% block content %}
+
+    <style>
+    .activeCust {
+    color: white;
+    background: lightsteelblue;
+    }
+    </style>
+
+    <div class="container">
+    <h1>Bid abstracts</h1>
+   <table class="table">
+  <thead class="thead-light">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Author</th>
+      <th scope="col">Title</th>
+    </tr>
+  </thead>
+  <tbody>
+
+  {% for abstract in abstracts %}
+
+      <tr id="{{ abstract.id }}" onclick="clickTr(this.id)">
+        <th scope="row">{{ abstract.id }}</th>
+        <td>{{ abstract.author }}</td>
+        <td>{{  abstract.title }}</td>
+      </tr>
+
+  {% endfor %}
+
+{#    <tr id=1 onclick="clickTr(this.id)">#}
+{#      <th scope="row">1</th>#}
+{#      <td>Mark Spencer</td>#}
+{#      <td>Reptiles</td>#}
+{#    </tr>#}
+{#    <tr id=2 onclick="clickTr(id)">#}
+{#      <th scope="row">2</th>#}
+{#      <td>Jacob Thornton</td>#}
+{#      <td>Lizards</td>#}
+{#    </tr>#}
+{#    <tr id=3 onclick="clickTr(id)">#}
+{#      <th scope="row">3</th>#}
+{#      <td>Larry Shumm</td>#}
+{#      <td>Birds</td>#}
+{#    </tr>#}
+  </tbody>
+</table>
+        <button type="button" class="btn btn-outline-success" onclick="bid()" style ="position: relative; top: 20px">Bid</button>
+   <button type="button" class="btn btn-outline-danger" onclick="reject()" style="position: relative; top: 20px; left: 10px">Reject</button>
+    <button type="button" class="btn btn-outline-secondary" onclick="redirect()" style="position: relative; top: 20px; left: 20px">See details</button>
+    </div>
+
+<script>
+own_id = {{ id }}
+
+function redirect(){
+    var a_id = findSelectedAbstract();
+    window.location = '/bid/paper/' + a_id + '/';
+
+}
+
+function select(id) {
+    console.log("ok am aj");
+    var item = document.getElementById(id);
+    var classL = item.classList;
+    if(classL.contains("activeCust")){
+        classL.remove("activeCust");
+    }
+    else{
+        classL.add("activeCust");
+    }
+}
+
+function findSelectedAbstract() {
+    var trs = document.getElementsByTagName("tr");
+    for (var i = 0; i < trs.length; i++) {
+        if (trs[i].classList.contains('activeCust'))
+            return trs[i].getAttribute('id');
+    }
+    return null;
+}
+function bid(){
+    a_id = findSelectedAbstract();
+    $(document).ready(function() {
+    jQuery.ajax({
+        type : "POST",
+        url : '/bid/accept/' + own_id + '/' + a_id + '/',
+        dataType: 'json',
+        async: true,
+        data: {
+            csrfmiddlewaretoken: "{{ csrf_token }}" ,
+            
+        },
+        success: function (html) {
+            console.log("Chilll");
+        }
+    },
+    )});
+    eliminateSelected();
+}
+
+function reject(){
+    a_id = findSelectedAbstract();
+    $(document).ready(function() {
+    jQuery.ajax({
+        type : "POST",
+        url : '/bid/reject/' + own_id + '/' + a_id + '/',
+        dataType: 'json',
+        async: true,
+        data: {
+            csrfmiddlewaretoken: "{{ csrf_token }}" ,
+
+        },
+        success: function (html) {
+            console.log("Chilll");
+        }
+    },
+    )});
+    eliminateSelected();
+
+}
+
+function eliminateSelected(){
+    var elements = document.getElementsByTagName("tr");
+    var deleted = [];
+    for (var i = 0; i < elements.length; i++) {
+        var item = elements[i];
+        if( item.classList.contains("activeCust")){
+            deleted.push(item);
+        }
+    }
+    deleted.map(function(el){
+        el.parentElement.removeChild(el);
+    })
+
+}
+function cleanTr(){
+    var trs = document.getElementsByTagName("tr");
+    for (var i = 0 ; i < trs.length; i++){
+        if(trs[i].classList.contains("activeCust")){
+            trs[i].classList.remove("activeCust");
+        }
+    }
+}
+
+function clickTr(id){
+    var el = document.getElementById(id);
+    var classL = el.classList;
+    cleanTr();
+    classL.add("activeCust");
+}
+
+
+</script>
+
+{% endblock content %}

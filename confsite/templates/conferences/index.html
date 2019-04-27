@@ -1,0 +1,49 @@
+{% extends 'confsite/base.html' %}
+{% block content %}
+    <div class="content-section">
+        <div class="container">
+            {#    aici trebuie adaugat userul curent si verificat daca poate participa#}
+            <div class="row">Hello , {{ currentUser }}</div>
+            {% if conferences %}
+                <ul class="list-group list-group-flush">
+                    {% for conference in conferences %}
+                        <li class="list-group-item">{{ conference.name }} will start in <span
+                                class="badge">{{ conference.conferenceDate }} </span>
+                        </li>
+                        </li>
+                        <div class="row">
+
+
+                        </div>
+                        <div class="row">
+                            <p class="badge">Conference Sessions:</p>
+                            <ul class="list-group list-group-flush">
+                                {% for  session in conferenceSession %}
+                                    {% if  session.pcId.cId == conference %}
+                                        <li class="list-group-item">From {{ session.startHour }}
+                                            to {{ session.endHour }}
+                                            with the supervisor {{ session.pcId.pEmail.name }} in
+                                            room {{ session.roomNumber }}
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-primary"
+                                                        style="float: right" type="submit">Join Now
+                                                </button>
+                                            </form>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+                    {% endfor %}
+                </ul>
+
+            {% else %}
+                <p>There are no conferences available</p>
+            {% endif %}
+
+
+        </div>
+    </div>
+{% endblock %}
